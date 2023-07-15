@@ -1,0 +1,101 @@
+.slidebar{
+    top:20%;
+    position: fixed;
+    left:-250px;
+    width: 250px;
+    height:50%;
+    background-color:yellow;
+    transition: 0.8s;
+}
+.slidebar header{
+   font-size:22px;
+   color:Black;
+   text-align: center;
+   line-height:70PX;
+   user-select: none;
+}
+.slidebar ul li{
+width: 60%;
+list-style-type: none;
+display: flex;
+margin-right: 5px;
+font-size: 30px;
+
+}
+.slidebar ul li a{
+margin-left: 30px;
+text-decoration: none;
+color:black;
+}
+#check{
+display: none;
+}
+#cancel{
+left:-250px;
+}
+label #btn,label #cancel{
+top:50px;
+position: absolute;
+cursor:pointer;
+}
+#check:checked ~ .slidebar{
+left : 0;
+}
+#check:checked ~ label #btn{
+left :250px;
+opacity: 0;
+pointer-events:none;
+}
+#check:checked ~ label #cancel{
+left: 220px;
+}
+.searchbar{
+height: 30px;
+margin-left:35%;
+width:400px;
+cursor:pointer;
+display: flex;
+padding: 10px 10px;
+background: #fff;
+border-radius:30px;
+align-items: center;
+box-shadow : 0 10px 25px rgba(0,0,0,0.3);
+transition: 0.8s;
+}
+.searchbar:hover input{
+width : 400px;
+}
+.searchbar input{
+width:0;
+outline:none;
+border:none;
+transition: 0.8s;
+background:transparent;
+}
+body{
+background-color: grey;
+}
+.entrytask{
+    height: 30px;
+    margin-top:5%;
+    margin-left:35%;
+    width:400px;
+    cursor:pointer;
+    display: flex;
+    padding: 10px 10px;
+    background: #fff;
+    border-radius:30px;
+    align-items: center;
+    box-shadow : 0 10px 25px rgba(0,0,0,0.3);
+    transition: 0.8s;
+}
+.entrytask:hover input{
+    width : 400px;
+}
+.entrytask input{
+    width:0;
+    outline:none;
+    border:none;
+    transition: 0.8s;
+    background:transparent;
+}

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <title>ToDo App</title>
+  <!-- <style>
+    .list {
+      width: 200px;
+      background-color: lightgray;
+      padding: 10px;
+    }
+
+    li {
+      background-color: white;
+      border: 1px solid black;
+      margin-bottom: 5px;
+      padding: 5px;
+      cursor: grab;
+    }
+  </style> -->
+</head>
+
+<body>
+  <input type="checkbox" id="check">
+    <label for="check">
+        <i class="fa-solid fa-house-chimney" id="btn"></i>
+        <i class="fa-solid fa-circle-xmark" id="cancel"></i>
+    </label>  
+    <div class="slidebar">
+        <header>NEO BAR</header>
+         <ul>
+              <li><i class="fa-solid fa-lightbulb"></i><a href="#"> Notes</a></li>
+              <li> <i class="fa-solid fa-bell"></i><a href="#">Remainder</a></li>
+              <li> <i class="fa-solid fa-square-pen"></i><a href="#">EditLables</a></li>
+              <li> <i class="fa-solid fa-inbox"></i><a href="#">Archive</a></li>
+              <li><i class="fa-solid fa-trash"></i><a href="#"> Trash</a></li>
+              
+        </ul>
+    </div>
+ <div class="searchbar">
+     <input type="text" id="searchInput" placeholder="Search by title">
+     <button type="button" id="searchButton"><i class="fa-brands fa-searchengin"></i></button>
+     <ul id="todoList"></ul>
+  </div>   
+  <h1>ToDo App</h1>
+<div class="entrytask">
+  <form id="todoForm">
+    <input type="text" id="titleInput" placeholder="Enter a title" required>
+    <button type="submit">Add</button>
+  </form>
+</div>
+  <ul id="todoList" class="list"></ul>
+  <script >
+const searchInput = document.getElementById('searchInput');
+const searchButton = document.getElementById('searchButton');
+
+// Function to render the todos in the list
+// const renderTodos = (todos) => {
+//   todoList.innerHTML = '';
+
+//   todos.forEach((todo) => {
+//     const li = document.createElement('li');
+//     li.textContent = todo.title;
+//     todoList.appendChild(li);
+//   });
+// };
+
+//Function to fetch todos from the server
+const fetchTodos = async () => {
+  try {
+    const response = await fetch('/api/todos');
+    if (response.ok) {
+      const todos = await response.json();
+      renderTodos(todos);
+    } else {
+      console.error('Error fetching todos:', response.status);
+    }
+  } catch (error) {
+    console.error('Error fetching todos:', error);
+  }
+};
+
+// Function to search todos by title
+const searchTodos = async (searchTerm) => {
+  try {
+    const response = await fetch(`/api/todos?search=${encodeURIComponent(searchTerm)}`);
+    const taggedElements=document.getElementsByTagName('li');
+    if (response.ok) {
+      const todos = await response.json();
+      
+      console.log(todos);
+      for (let i = 0; i < todos.length; i++) {
+  if (todos[i].title.includes(searchTerm)) {
+    console.log(todos[i]);
+  }
+  else
+  {
+    taggedElements[i].style.display = 'none';
+  
+  }
+}
+      
+    } else {
+      console.error('Error searching todos:', response.status);
+    }
+  } catch (error) {
+    console.error('Error searching todos:', error);
+  }
+};
+
+// Event listener for search button click
+searchButton.addEventListener('click', () => {
+  const searchTerm = searchInput.value.trim();
+  searchTodos(searchTerm);
+});
+
+// Fetch todos on page load
+//fetchTodos();
+
+    const todoForm = document.getElementById('todoForm');
+const titleInput = document.getElementById('titleInput');
+const todoList = document.getElementById('todoList');
+
+// Function to delete a ToDo item
+const deleteTodo = (id) => {
+  fetch(`/api/todos/${id}`, {
+    method: 'DELETE',
+  })
+    .then(() => {
+      const listItem = document.getElementById(id);
+      if (listItem) {
+        listItem.remove();
+      }
+    })
+    .catch((error) => {
+      console.error('Error deleting ToDo:', error);
+    });
+};
+
+// Function to update a ToDo item
+const updateTodo = (id, title) => {
+  const todo = { title };
+
+  fetch(`/api/todos/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(todo),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      const listItem = document.getElementById(data.id);
+      if (listItem) {
+        listItem.firstChild.textContent = data.title;
+      }
+    })
+    .catch((error) => {
+      console.error('Error updating ToDo:', error);
+    });
+};
+
+// Function to create a ToDo item
+const createTodo = (title) => {
+  const todo = { title };
+
+  fetch('/api/todos', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(todo),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      const li = document.createElement('li');
+      const text=document.createElement('textarea');
+      text.textContent = data.title;
+
+      const updateButton = document.createElement('button');
+      updateButton.textContent = 'Update';
+      updateButton.addEventListener('click', () => {
+        var textarea1 = document.getElementsByTagName("textarea");
+        updatedTitle=textarea1[data.class].value;
+        if (updatedTitle) {
+          updateTodo(data.id, updatedTitle);
+        }
+      });
+
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Delete';
+      deleteButton.addEventListener('click', () => {
+        deleteTodo(data.id);
+      });
+      li.appendChild(text);
+      li.appendChild(updateButton);
+      li.appendChild(deleteButton);
+      li.id = data.id;
+      todoList.appendChild(li);
+      titleInput.value = '';
+    })
+    .catch((error) => {
+      console.error('Error creating ToDo:', error);
+    });
+};
+
+// Fetch all ToDo items from the API and display them
+fetch('/api/todos')
+  .then((response) => response.json())
+  .then((data) => {
+    data.forEach((todo) => {
+      const li = document.createElement('li');
+      li.id="item"+String(todo.class);
+      const text=document.createElement('textarea');
+      text.textContent=todo.title;
+      const updateButton = document.createElement('button');
+      updateButton.textContent = 'Update';
+      updateButton.addEventListener('click', () => {
+        var textarea1 = document.getElementsByTagName("textarea");
+        updatedTitle=textarea1[todo.class].value;
+        console.log(updatedTitle);
+        if (updatedTitle) {
+          updateTodo(todo.id, updatedTitle);
+        }
+      });
+
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Delete';
+      deleteButton.addEventListener('click', () => {
+        deleteTodo(todo.id);
+      });
+      li.appendChild(text);
+      li.appendChild(updateButton);
+      li.appendChild(deleteButton);
+      li.id = todo.id;
+      todoList.appendChild(li);
+    });
+  })
+  .catch((error) => {
+    console.error('Error fetching ToDo items:', error);
+  });
+
+// Submit the form to create a new ToDo item
+todoForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const title = titleInput.value;
+  createTodo(title);
+});
+
+ 
+      var listItems = document.querySelectorAll('li');
+  
+      listItems.forEach(function(item) {
+        item.addEventListener('dragstart', dragStart);
+        item.addEventListener('dragend', dragEnd);
+      });
+  
+      document.addEventListener('dragover', dragOver);
+      document.addEventListener('dragenter', dragEnter);
+      document.addEventListener('dragleave', dragLeave);
+      document.addEventListener('drop', dragDrop);
+  
+      function dragStart(event) {
+        event.dataTransfer.setData('text/plain', event.target.id);
+        event.currentTarget.style.opacity = '0.4';
+      }
+  
+      function dragEnd(event) {
+        event.currentTarget.style.opacity = '1';
+      }
+  
+      function dragOver(event) {
+        event.preventDefault();
+      }
+  
+      function dragEnter(event) {
+        event.preventDefault();
+        if (event.target.tagName('li')) {
+          event.target.style.backgroundColor = 'lightblue';
+        }
+      }
+  
+      function dragLeave(event) {
+        event.preventDefault();
+        if (event.target.tagName('list-item')) {
+          event.target.style.backgroundColor = 'white';
+        }
+      }
+  
+      function dragDrop(event) {
+        event.preventDefault();
+        var data = event.dataTransfer.getData('text/plain');
+        var element = document.getElementById(data);
+        event.target.appendChild(element);
+        event.target.style.backgroundColor = 'lightgray';
+      }
+    </script>
+</body>
+
+</html>
